@@ -1,0 +1,13 @@
+<% code %>: Runs JavaScript code, such as conditionals or loops, with no output to HTML.
+
+<%= expression %>: Outputs the value of expression, escaping HTML (safe for user data).
+
+<%- expression %>: Outputs the value of expression without escaping HTML (renders raw HTML).
+
+<%# comment %>: Comment tag, not rendered or executed.
+
+<%% or %%>: Outputs a literal <% or %>.
+
+<%_ code %>: Removes whitespace before the tag (whitespace slurping).
+
+<%- include('filename') %>: Includes another EJS template file.

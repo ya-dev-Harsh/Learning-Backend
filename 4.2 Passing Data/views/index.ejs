@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passing data</title>
+</head>
+
+<body>
+    <% if(locals.numberOfLetters){ %>
+        
+        <%# locals refers to the local variables available in the EJS template that are passed from the server (such as
+            via res.render('view', { numberOfLetters: someValue })).
+            
+            locals.numberOfLetters is checking if the variable
+            numberOfLetters is defined and truthy.
+            
+            If locals.numberOfLetters is truthy (e.g., a number greater than
+            zero), the template renders: %>
+
+            <h1>Your name has <%= numberOfLetters %> letters</h1>
+            <%}else{ %>
+                <h1>Enter your name below ⬇️</h1>
+                <%} %>
+                    <form action="/submit" method="POST">
+                        <input type="text" name="fname" placeholder="First name">
+                        <input type="text" name="lname" placeholder="last name">
+                        <input type="submit" value="OK">
+                    </form>
+</body>
+
+</html>

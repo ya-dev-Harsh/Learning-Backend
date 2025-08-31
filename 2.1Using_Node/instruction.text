@@ -1,0 +1,41 @@
+spme basic Commands to use node :
+
+node file.js: Run a JavaScript file named file.js.
+
+node: Starts the interactive REPL (Read-Eval-Print Loop) to execute JavaScript code interactively.
+
+node --version or node -v: Shows the installed Node.js version.
+
+node --help: Displays help with available Node commands and options.
+
+node -e "script": Evaluate and run a JavaScript snippet directly from the command line.
+
+node -p "expression": Evaluate an expression and print its result.
+
+node --check file.js: Check syntax of the script without running it.
+
+node --require module file.js: Preload a module before running a script.
+
+node --trace-warnings file.js: Show stack traces for warnings.
+
+node --max-old-space-size=SIZE file.js: Set the maximum memory size for V8 (in MB).
+
+
+
+
+
+Some basic commands to use bash :
+
+ls: Lists the contents of a directory.
+cd: Changes the current working directory.
+pwd: Prints the current working directory.
+mkdir: Creates a new directory.
+touch: Creates an empty file or updates the timestamp of an existing file.
+cp: Copies files or directories.
+mv: Moves or renames files or directories.
+rm: Deletes files or directories.
+cat: Concatenates and displays the content of files.
+grep: Searches for patterns within text files.
+echo: Displays a line of text or variables.
+chmod: Changes file permissions.
+sudo: Executes a command with administrative privileges

@@ -1,0 +1,21 @@
+<%- include("partials/header.ejs") %>
+
+<div class="container">
+  <h1>Band Name Generator</h1>
+
+  <div class="band-name">
+    <% if (locals.adjective && locals.noun) { %>
+      <h2 id="bandName"><%= adjective %> <%= noun %></h2>
+    <% } else { %>
+      <h2 id="bandName">Click the button to generate a name!</h2>
+    <% } %>
+  </div>
+
+  <form action="/submit" method="POST">
+    <button type="submit" class="btn">Generate Name</button>
+  </form>
+
+  <button id="resetBtn" class="btn btn-reset">Reset</button>
+</div>
+
+<%- include("partials/footer.ejs") %>
