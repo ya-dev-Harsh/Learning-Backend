@@ -7,34 +7,93 @@ const masterKey = "4VGP2DN-6EWM4SJ-N6FGRHV-Z3PR3TT";
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
-//1. GET a random joke
- app.get("/random", (req,res) => {
+
+app.get("/random", (req, res) => {
   const randomNumber = Math.floor(Math.random() * jokes.length)
   res.json(jokes[randomNumber]);
- })
-//2. GET a specific joke
-app.get("/specific/:id", (req, res) => { 
-  const id = parseInt(req.params.id); 
+})
+
+app.get("/specific/:id", (req, res) => {
+  const id = parseInt(req.params.id);
   // /specific/:id here id is a parameter so (req.paramss.id) is used but
   //  if the route woud be /specific?id=any_id then (req.query.id) will be used .
   const foundJoke = jokes.find((joke) => joke.id === id);
   res.json(foundJoke);
 });
-//3. GET a jokes by filtering on the joke type
+
 app.get("/filter", (req, res) => {
   const type = req.query.type;
   const filteredActivities = jokes.filter((joke) => joke.jokeType === type);
   res.json(filteredActivities);
 });
-//4. POST a new joke
 
-//5. PUT a joke
+app.post("/jokes", (req, res) => {
+  const newJoke = {
+    id: jokes.length + 1,
+    jokeText: req.body.text,
+    jokeType: req.body.type
+  };
+  jokes.push(newJoke);
+  console.log(jokes.slice(-1));
+  res.json(newJoke);
+})
 
-//6. PATCH a joke
+app.put("/replace/:id", (req, res) => {
+  const id = parseInt(req.params.id)
+  const replacedJoke = {
+    id: id,
+    jokeText: req.body.text,
+    jokeType: req.body.type
+  }
 
-//7. DELETE Specific joke
+  const searchIndex = jokes.findIndex((joke) => joke.id === id);
 
-//8. DELETE All jokes
+  jokes[searchIndex] = replacedJoke;
+  res.json(replacedJoke);
+})
+
+app.patch("/edit/:id", (req,res) => {
+  const id = parseInt(req.params.id);
+
+    const searchJoke = jokes.find( (joke) => joke.id === id) // if you use curly braces then you have to add return keyword :- jokes.find ( (joke) => {return joke.id === id)}
+
+  const editedJoke = {
+    id: id,
+    jokeText: req.body.text || searchJoke.jokeText,
+    jokeType: req.body.type || searchJoke.jokeType,
+    // here or operator will work like if you have edited the joke then it will patch it but if not then it will show the already existing joke.
+  }
+
+  const searchIndex = jokes.findIndex( (joke) => joke.id === id)
+
+jokes[searchIndex] = editedJoke;
+res.json(editedJoke);
+})
+
+app.delete("/delete/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  const searchIndex = jokes.findIndex((joke) => joke.id === id);
+  if (searchIndex > -1) {
+    jokes.splice(searchIndex, 1);
+    res.sendStatus(200);
+  } else {
+    res
+      .status(404)
+      .json({ error: `Joke with id: ${id} not found. No jokes were deleted.` });
+  }
+});
+
+app.delete("/delete_all", (req, res) => {
+  const userKey = req.query.key;
+  if (userKey === masterKey) {
+    jokes = [];
+    res.sendStatus(200);
+  } else {
+    res
+      .status(404)
+      .json({ error: `You are not authorised to perform this action.` });
+  }
+});
 
 app.listen(port, () => {
   console.log(`Successfully started server on port ${port}.`);
@@ -611,4 +670,4 @@ var jokes = [
     jokeText: "What do you call fake spaghetti? An impasta!",
     jokeType: "Food",
   },
-];
+]
