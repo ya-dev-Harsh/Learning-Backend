@@ -8,11 +8,24 @@ const masterKey = "4VGP2DN-6EWM4SJ-N6FGRHV-Z3PR3TT";
 app.use(bodyParser.urlencoded({ extended: true }));
 
 //1. GET a random joke
-
+ app.get("/random", (req,res) => {
+  const randomNumber = Math.floor(Math.random() * jokes.length)
+  res.json(jokes[randomNumber]);
+ })
 //2. GET a specific joke
-
+app.get("/specific/:id", (req, res) => { 
+  const id = parseInt(req.params.id); 
+  // /specific/:id here id is a parameter so (req.paramss.id) is used but
+  //  if the route woud be /specific?id=any_id then (req.query.id) will be used .
+  const foundJoke = jokes.find((joke) => joke.id === id);
+  res.json(foundJoke);
+});
 //3. GET a jokes by filtering on the joke type
-
+app.get("/filter", (req, res) => {
+  const type = req.query.type;
+  const filteredActivities = jokes.filter((joke) => joke.jokeType === type);
+  res.json(filteredActivities);
+});
 //4. POST a new joke
 
 //5. PUT a joke
