@@ -1,14 +1,29 @@
 import express from "express";
 import bodyParser from "body-parser";
+import pg from "pg";
+
+const db = new pg.Client({
+  user: "postgres",
+  host: "localhost",
+  database: "World",
+  password: "Harsh_2323490",
+  port: 5432,
+});
 
 const app = express();
 const port = 3000;
 
-let quiz = [
-  { country: "France", capital: "Paris" },
-  { country: "United Kingdom", capital: "London" },
-  { country: "United States of America", capital: "New York" },
-];
+db.connect();
+
+let quiz = [];
+db.query("SELECT * FROM capitals", (err, res) => {
+  if (err) {
+    console.error("Error executing query", err.stack);
+  } else {
+    quiz = res.rows;
+  }
+  db.end();
+});
 
 let totalCorrect = 0;
 
@@ -23,14 +38,14 @@ app.get("/", async (req, res) => {
   totalCorrect = 0;
   await nextQuestion();
   console.log(currentQuestion);
-  res.render("index.ejs", { question: currentQuestion });
+  res.render("index.ejs", { question: currentQuestion});
 });
 
 // POST a new post
 app.post("/submit", (req, res) => {
   let answer = req.body.answer.trim();
   let isCorrect = false;
-  if (currentQuestion.capital.toLowerCase() === answer.toLowerCase()) {
+  if (currentQuestion.capitals.toLowerCase() === answer.toLowerCase()) {
     totalCorrect++;
     console.log(totalCorrect);
     isCorrect = true;
@@ -46,7 +61,6 @@ app.post("/submit", (req, res) => {
 
 async function nextQuestion() {
   const randomCountry = quiz[Math.floor(Math.random() * quiz.length)];
-
   currentQuestion = randomCountry;
 }
 
