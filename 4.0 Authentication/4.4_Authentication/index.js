@@ -14,7 +14,7 @@ env.config();
 
 app.use(
   session({
-    secret: "TOPSECRETWORD",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
   })
@@ -28,8 +28,8 @@ app.use(passport.session());
 const db = new pg.Client({
   user: "postgres",
   host: "localhost",
-  database: "secrets",
-  password: "123456",
+  database: "World",
+  password: "Harsh_2323490",
   port: 5432,
 });
 db.connect();
@@ -77,7 +77,7 @@ app.post("/register", async (req, res) => {
   const password = req.body.password;
 
   try {
-    const checkResult = await db.query("SELECT * FROM users WHERE email = $1", [
+    const checkResult = await db.query("SELECT * FROM userss WHERE email = $1", [
       email,
     ]);
 
@@ -89,7 +89,7 @@ app.post("/register", async (req, res) => {
           console.error("Error hashing password:", err);
         } else {
           const result = await db.query(
-            "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *",
+            "INSERT INTO userss (email, password) VALUES ($1, $2) RETURNING *",
             [email, hash]
           );
           const user = result.rows[0];
@@ -108,7 +108,7 @@ app.post("/register", async (req, res) => {
 passport.use(
   new Strategy(async function verify(username, password, cb) {
     try {
-      const result = await db.query("SELECT * FROM users WHERE email = $1 ", [
+      const result = await db.query("SELECT * FROM userss WHERE email = $1 ", [
         username,
       ]);
       if (result.rows.length > 0) {
