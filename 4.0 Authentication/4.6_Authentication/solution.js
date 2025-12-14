@@ -63,7 +63,7 @@ app.get("/secrets", async (req, res) => {
   if (req.isAuthenticated()) {
     try {
       const result = await db.query(
-        `SELECT secret FROM users WHERE email = $1`,
+        `SELECT secret FROM userss WHERE email = $1`,
         [req.user.email]
       );
       console.log(result);
@@ -118,7 +118,7 @@ app.post("/register", async (req, res) => {
   const password = req.body.password;
 
   try {
-    const checkResult = await db.query("SELECT * FROM users WHERE email = $1", [
+    const checkResult = await db.query("SELECT * FROM userss WHERE email = $1", [
       email,
     ]);
 
@@ -130,7 +130,7 @@ app.post("/register", async (req, res) => {
           console.error("Error hashing password:", err);
         } else {
           const result = await db.query(
-            "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *",
+            "INSERT INTO userss (email, password) VALUES ($1, $2) RETURNING *",
             [email, hash]
           );
           const user = result.rows[0];
@@ -152,7 +152,7 @@ app.post("/submit", async function (req, res) {
   const submittedSecret = req.body.secret;
   console.log(req.user);
   try {
-    await db.query(`UPDATE users SET secret = $1 WHERE email = $2`, [
+    await db.query(`UPDATE userss SET secret = $1 WHERE email = $2`, [
       submittedSecret,
       req.user.email,
     ]);
@@ -166,7 +166,7 @@ passport.use(
   "local",
   new Strategy(async function verify(username, password, cb) {
     try {
-      const result = await db.query("SELECT * FROM users WHERE email = $1 ", [
+      const result = await db.query("SELECT * FROM userss WHERE email = $1 ", [
         username,
       ]);
       if (result.rows.length > 0) {
@@ -204,12 +204,12 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, cb) => {
       try {
-        const result = await db.query("SELECT * FROM users WHERE email = $1", [
+        const result = await db.query("SELECT * FROM userss WHERE email = $1", [
           profile.email,
         ]);
         if (result.rows.length === 0) {
           const newUser = await db.query(
-            "INSERT INTO users (email, password) VALUES ($1, $2)",
+            "INSERT INTO userss (email, password) VALUES ($1, $2)",
             [profile.email, "google"]
           );
           return cb(null, newUser.rows[0]);

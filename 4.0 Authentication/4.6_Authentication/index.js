@@ -56,18 +56,34 @@ app.get("/logout", (req, res) => {
   });
 });
 
-app.get("/secrets", (req, res) => {
+app.get("/secrets", async(req, res) => {
+    console.log(req.user);
   if (req.isAuthenticated()) {
-    res.render("secrets.ejs");
-
-    //TODO: Update this to pull in the user secret to render in secrets.ejs
+   try {
+    const result = await db.query("SELECT secret FROM userss WHERE email = $1", [req.user.email])
+    console.log(result);
+    
+    const secret = result.rows[0].secret;
+    if (secret) {
+      res.render("secrets.ejs", { secret: secret });
+    } else {
+      res.render("secrets.ejs", {secret: "Batman is my hero"})
+    }
+   } catch (err) {
+    console.log(err);
+   }
   } else {
     res.redirect("/login");
   }
 });
 
-//TODO: Add a get route for the submit button
-//Think about how the logic should work with authentication.
+app.get("/submit",function (req, res) {
+  if(req.isAuthenticated()){
+    res.render("submit.ejs")
+  } else {
+    res.redirect("/login")
+  }
+})
 
 app.get(
   "/auth/google",
@@ -97,7 +113,7 @@ app.post("/register", async (req, res) => {
   const password = req.body.password;
 
   try {
-    const checkResult = await db.query("SELECT * FROM users WHERE email = $1", [
+    const checkResult = await db.query("SELECT * FROM userss WHERE email = $1", [
       email,
     ]);
 
@@ -109,7 +125,7 @@ app.post("/register", async (req, res) => {
           console.error("Error hashing password:", err);
         } else {
           const result = await db.query(
-            "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *",
+            "INSERT INTO userss (email, password) VALUES ($1, $2) RETURNING *",
             [email, hash]
           );
           const user = result.rows[0];
@@ -125,14 +141,25 @@ app.post("/register", async (req, res) => {
   }
 });
 
-//TODO: Create the post route for submit.
-//Handle the submitted data and add it to the database
+app.post("/submit", async function (req, res) {
+  const submittedSecret = req.body.secret;
+  console.log(req.user);
+  try {
+    await db.query(`UPDATE userss SET secret = $1 WHERE email = $2`, [
+      submittedSecret,
+      req.user.email,
+    ]);
+    res.redirect("/secrets");
+  } catch (err) {
+    console.log(err);
+  }
+});
 
 passport.use(
   "local",
   new Strategy(async function verify(username, password, cb) {
     try {
-      const result = await db.query("SELECT * FROM users WHERE email = $1 ", [
+      const result = await db.query("SELECT * FROM userss WHERE email = $1 ", [
         username,
       ]);
       if (result.rows.length > 0) {
@@ -171,12 +198,12 @@ passport.use(
     async (accessToken, refreshToken, profile, cb) => {
       try {
         console.log(profile);
-        const result = await db.query("SELECT * FROM users WHERE email = $1", [
+        const result = await db.query("SELECT * FROM userss WHERE email = $1", [
           profile.email,
         ]);
         if (result.rows.length === 0) {
           const newUser = await db.query(
-            "INSERT INTO users (email, password) VALUES ($1, $2)",
+            "INSERT INTO userss (email, password) VALUES ($1, $2)",
             [profile.email, "google"]
           );
           return cb(null, newUser.rows[0]);
